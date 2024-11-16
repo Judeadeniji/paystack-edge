@@ -1,4 +1,3 @@
-import { Axios } from 'axios';
 import {
   CreateDedicatedVirtualAccount,
   DeactivateDedicatedAccountResponse,
@@ -11,62 +10,75 @@ import {
   SplitDedicatedAccountTransaction,
   SplitDedicatedAccountTransactionResponse,
 } from './interface';
-
-interface BadRequest {
-  status: boolean;
-  message: string;
-}
+import { TPaysackFetch } from '../fetch';
 
 export class DedicatedAccount {
-  http: Axios;
-  constructor(http: Axios) {
+  http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async create(
-    data: CreateDedicatedVirtualAccount,
-  ): Promise<DedicatedAccountCreatedResponse | BadRequest> {
-    return await this.http.post('/dedicated_account', JSON.stringify(data));
-  }
-
-  async list(
-    queryParams: ListDedicatedVirtualAccountsQueryParams,
-  ): Promise<ListDedicatedVirtualAccountsResponse | BadRequest> {
-    return await this.http.get('/dedicated_account', {
-      params: { ...queryParams },
-    });
-  }
-
-  async fetch(
-    dedicatedAccountId: string,
-  ): Promise<FetchDedicatedVirtualAccountResponse | BadRequest> {
-    return await this.http.get(`/dedicated_account/${dedicatedAccountId}`);
-  }
-
-  async deactivate(
-    dedicatedAccountId: string,
-  ): Promise<DeactivateDedicatedAccountResponse | BadRequest> {
-    return await this.http.delete(`/dedicated_account/${dedicatedAccountId}`);
-  }
-
-  async splitTransaction(
-    data: SplitDedicatedAccountTransaction,
-  ): Promise<SplitDedicatedAccountTransactionResponse | BadRequest> {
-    return await this.http.post(
-      '/dedicated_account/split',
-      JSON.stringify(data),
+  async create(data: CreateDedicatedVirtualAccount) {
+    return await this.http<DedicatedAccountCreatedResponse>(
+      '/dedicated_account',
+      {
+        method: 'POST',
+        body: data,
+      },
     );
   }
 
-  async removeSplit(
-    accountNumber: string,
-  ): Promise<RemoveSplitDedicatedAccountResponse | BadRequest> {
-    return await this.http.delete('/dedicated_account/split', {
-      data: { account_number: accountNumber },
-    });
+  async list(queryParams: ListDedicatedVirtualAccountsQueryParams) {
+    return await this.http<ListDedicatedVirtualAccountsResponse>(
+      '/dedicated_account',
+      {
+        query: { ...queryParams },
+      },
+    );
   }
 
-  async providers(): Promise<FetchBankProvidersResponse | BadRequest> {
-    return await this.http.get('/dedicated_account/available_providers');
+  async fetch(dedicatedAccountId: string) {
+    return await this.http<FetchDedicatedVirtualAccountResponse>(
+      '/dedicated_account/:dedicatedAccountId',
+      {
+        params: { dedicatedAccountId },
+      },
+    );
+  }
+
+  async deactivate(dedicatedAccountId: string) {
+    return await this.http<DeactivateDedicatedAccountResponse>(
+      '/dedicated_account/:dedicatedAccountId',
+      {
+        method: 'DELETE',
+        params: { dedicatedAccountId },
+      },
+    );
+  }
+
+  async splitTransaction(data: SplitDedicatedAccountTransaction) {
+    return await this.http<SplitDedicatedAccountTransactionResponse>(
+      '/dedicated_account/split',
+      {
+        method: 'POST',
+        body: data,
+      },
+    );
+  }
+
+  async removeSplit(accountNumber: string) {
+    return await this.http<RemoveSplitDedicatedAccountResponse>(
+      '/dedicated_account/remove_split/:accountNumber',
+      {
+        method: 'DELETE',
+        params: { accountNumber },
+      },
+    );
+  }
+
+  async providers() {
+    return await this.http<FetchBankProvidersResponse>(
+      '/dedicated_account/providers',
+    );
   }
 }

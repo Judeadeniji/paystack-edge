@@ -1,4 +1,3 @@
-import { Axios } from 'axios';
 import {
   ChargeCreatedWithAddressResponse,
   ChargeCreatedWithBirthdayResponse,
@@ -16,61 +15,72 @@ import {
   SubmitPhone,
   SubmitPIN,
 } from './interface';
-
-interface BadRequest {
-  status: boolean;
-  message: string;
-}
+import { TPaysackFetch } from '../fetch';
 
 export class Charge {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
-  async create(
-    data: CreateCharge,
-  ): Promise<ChargeCreatedResponse | BadRequest> {
-    return await this.http.post('/charge', JSON.stringify(data));
+  async create(data: CreateCharge) {
+    // return await this.http.post('/charge', JSON.stringify(data));
+    return await this.http<ChargeCreatedResponse>('/charge', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async submitPIN(
-    data: SubmitPIN,
-  ): Promise<ChargeCreatedWithPinResponse | BadRequest> {
-    return await this.http.post('/charge/submit_pin', JSON.stringify(data));
+  async submitPIN(data: SubmitPIN) {
+    // return await this.http.post('/charge/submit_pin', JSON.stringify(data));
+    return await this.http<ChargeCreatedWithPinResponse>('/charge/submit_pin', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async submitOTP(
-    data: SubmitOTP,
-  ): Promise<ChargeCreatedWithOTPResponse | BadRequest> {
-    return await this.http.post('/charge/submit_otp', JSON.stringify(data));
+  async submitOTP(data: SubmitOTP) {
+    return await this.http<ChargeCreatedWithOTPResponse>('/charge/submit_otp', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async submitPhone(
-    data: SubmitPhone,
-  ): Promise<ChargeCreatedWithPhoneResponse | BadRequest> {
-    return await this.http.post('/charge/submit_phone', JSON.stringify(data));
-  }
-
-  async submitBirthday(
-    data: SubmitBirthday,
-  ): Promise<ChargeCreatedWithBirthdayResponse | BadRequest> {
-    return await this.http.post(
-      '/charge/submit_birthday',
-      JSON.stringify(data),
+  async submitPhone(data: SubmitPhone) {
+    return await this.http<ChargeCreatedWithPhoneResponse>(
+      '/charge/submit_phone',
+      {
+        method: 'POST',
+        body: data,
+      },
     );
   }
 
-  async submitAddress(
-    data: SubmitAddress,
-  ): Promise<ChargeCreatedWithAddressResponse | BadRequest> {
-    return await this.http.post('/charge/submit_address', JSON.stringify(data));
+  async submitBirthday(data: SubmitBirthday) {
+    return await this.http<ChargeCreatedWithBirthdayResponse>(
+      '/charge/submit_birthday',
+      {
+        method: 'POST',
+        body: data,
+      },
+    );
   }
 
-  async checkPending(
-    reference: string,
-  ): Promise<ChargeCreatedWithPendingResponse | BadRequest> {
-    return await this.http.get('/charge/submit_address', {
-      params: { reference },
-    });
+  async submitAddress(data: SubmitAddress) {
+    return await this.http<ChargeCreatedWithAddressResponse>(
+      '/charge/submit_address',
+      {
+        method: 'POST',
+        body: data,
+      },
+    );
+  }
+
+  async checkPending(reference: string) {
+    return await this.http<ChargeCreatedWithPendingResponse>(
+      '/charge/check_pending/:reference',
+      {
+        params: { reference },
+      },
+    );
   }
 }

@@ -1,5 +1,4 @@
-import { Axios } from 'axios';
-import { BadRequest } from '../interface';
+import { TPaysackFetch } from '../fetch';
 import {
   DomainRegisterResponse,
   ListDomainsResponse,
@@ -7,29 +6,29 @@ import {
 } from './interface';
 
 export class ApplePay {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async registerDomain(
-    domainName: string,
-  ): Promise<DomainRegisterResponse | BadRequest> {
-    return await this.http.post(
-      '/apple-pay/domain',
-      JSON.stringify({ domainName }),
-    );
-  }
-
-  async listDomains(): Promise<ListDomainsResponse | BadRequest> {
-    return await this.http.get('/apple-pay');
-  }
-
-  async unregisterDomain(
-    domainName: string,
-  ): Promise<UnregisterDomainRegisterResponse | BadRequest> {
-    return await this.http.delete('/apple-pay', {
-      params: { domainName },
+  async registerDomain(domainName: string) {
+    return await this.http<DomainRegisterResponse>('/apple-pay', {
+      method: 'POST',
+      body: { domainName },
     });
+  }
+
+  async listDomains() {
+    return await this.http<ListDomainsResponse>('/apple-pay');
+  }
+
+  async unregisterDomain(domainName: string) {
+    return await this.http<UnregisterDomainRegisterResponse>(
+      '/apple-pay/:domainName',
+      {
+        method: 'DELETE',
+        params: { domainName },
+      },
+    );
   }
 }

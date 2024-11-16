@@ -1,5 +1,3 @@
-import { Axios } from 'axios';
-import { BadRequest } from '../interface';
 import {
   CreateSplit,
   ListSplitQueryParams,
@@ -11,6 +9,7 @@ import {
   UpdateTransactionSplit,
   UpdateTransactionSplitResponse,
 } from './interface';
+import { TPaysackFetch } from '../fetch';
 
 /**
  * The Transaction Splits API enables merchants
@@ -18,56 +17,49 @@ import {
  * their payout account, and one or more Subaccounts.
  */
 export class TransactionSplit {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
   /**
    * Create a split payment on your integration
    */
-  async create(data: CreateSplit): Promise<SplitCreatedResponse | BadRequest> {
-    return await this.http.request({
-      url: '/split',
-      data: JSON.stringify(data),
-      method: 'post',
+  async create(data: CreateSplit) {
+    return await this.http<SplitCreatedResponse>('/split', {
+      method: 'POST',
+      body: data,
     });
   }
 
   /**
    * List/search for the transaction splits available on your integration.
    */
-  async list(
-    queryParams?: ListSplitQueryParams,
-  ): Promise<ListSplitsResponse | BadRequest> {
-    return await this.http.request({
-      url: '/split',
-      params: { ...queryParams },
-      method: 'get',
+  async list(queryParams?: ListSplitQueryParams) {
+    return await this.http<ListSplitsResponse>('/split', {
+      query: { ...queryParams },
     });
   }
 
   /**
    * Get details of a split on your integration.
    */
-  async fetch(splitId: string): Promise<TransactionSplitResponse | BadRequest> {
-    return await this.http.request({
-      url: `/split/${splitId}`,
-      method: 'get',
+  async fetch(splitId: string) {
+    return await this.http<TransactionSplitResponse>('split/:splitId', {
+      params: {
+        splitId,
+      },
     });
   }
 
   /**
    * Update a transaction split details on your integration
    */
-  async update(
-    splitId: string,
-    data: UpdateTransactionSplit,
-  ): Promise<UpdateTransactionSplitResponse | BadRequest> {
-    return await this.http.request({
-      url: `/split/${splitId}`,
-      data: JSON.stringify(data),
-      method: 'put',
+  async update(splitId: string, data: UpdateTransactionSplit) {
+    return await this.http<UpdateTransactionSplitResponse>('/split/:splitId', {
+      method: 'PUT',
+      params: { splitId },
+      body: data,
     });
   }
 
@@ -75,28 +67,21 @@ export class TransactionSplit {
    * Add a Subaccount to a Transaction Split,
    * or update the share of an existing Subaccount in a Transaction Split
    */
-  async add(
-    splitId: string,
-    data: SplitSubAccount,
-  ): Promise<TransactionSplitResponse | BadRequest> {
-    return await this.http.request({
-      url: `/split/${splitId}/subaccount/add`,
-      data: JSON.stringify(data),
-      method: 'post',
+  async add(splitId: string, data: SplitSubAccount) {
+    return await this.http<Response>('/split/:splitId/subaccount', {
+      method: 'POST',
+      params: { splitId },
+      body: data,
     });
   }
 
   /**
    * Remove a subaccount from a transaction split
    */
-  async remove(
-    splitId: string,
-    subaccount: string,
-  ): Promise<Response | BadRequest> {
-    return await this.http.request({
-      url: `/split/${splitId}/subaccount/remove`,
-      data: JSON.stringify({ subaccount }),
-      method: 'post',
+  async remove(splitId: string, subaccount: string) {
+    return await this.http<Response>('/split/:splitId/subaccount/:subaccount', {
+      method: 'DELETE',
+      params: { splitId, subaccount },
     });
   }
 }

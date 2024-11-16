@@ -1,4 +1,4 @@
-import { Axios } from 'axios';
+import { TPaysackFetch } from '../fetch';
 import {
   CreateSubscription,
   EnableOrDisableSubscription,
@@ -16,47 +16,63 @@ interface BadRequest {
 }
 
 export class Subscription {
-  http: Axios;
-  constructor(http: Axios) {
+  http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async create(
-    data: CreateSubscription,
-  ): Promise<SubscriptionCreated | BadRequest> {
-    return await this.http.post('/subscription', JSON.stringify(data));
+  async create(data: CreateSubscription) {
+    return await this.http<SubscriptionCreated | BadRequest>('/subscription', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async list(
-    queryParams?: ListSubscriptionQueryParams,
-  ): Promise<ListSubscriptions | BadRequest> {
-    return await this.http.get('/subscription', { params: { ...queryParams } });
+  async list(queryParams?: ListSubscriptionQueryParams) {
+    return await this.http<ListSubscriptions | BadRequest>('/subscription', {
+      query: { ...queryParams },
+    });
   }
 
-  async fetch(idOrCode: string): Promise<FetchSubscription | BadRequest> {
-    return await this.http.get(`/subscription/${idOrCode}`);
+  async fetch(idOrCode: string) {
+    return await this.http<FetchSubscription | BadRequest>(
+      'subscription/:idOrCode',
+      {
+        params: { idOrCode },
+      },
+    );
   }
 
-  async enable(
-    data: EnableOrDisableSubscription,
-  ): Promise<Response | BadRequest> {
-    return await this.http.post('/subscription/enable', JSON.stringify(data));
-  }
-  async disable(
-    data: EnableOrDisableSubscription,
-  ): Promise<Response | BadRequest> {
-    return await this.http.post('/subscription/disable', JSON.stringify(data));
+  async enable(data: EnableOrDisableSubscription) {
+    return await this.http<Response | BadRequest>('/subscription/enable', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async generateSubscriptionLink(
-    code: string,
-  ): Promise<GenerateSubscriptionLink | BadRequest> {
-    return await this.http.get(`/subscription/${code}/manage/link`);
+  async disable(data: EnableOrDisableSubscription) {
+    return await this.http<Response | BadRequest>('/subscription/disable', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async sendUpdateSubscriptionLink(
-    code: string,
-  ): Promise<Response | BadRequest> {
-    return await this.http.post(`/subscription/${code}/manage/email`);
+  async generateSubscriptionLink(code: string) {
+    return await this.http<GenerateSubscriptionLink | BadRequest>(
+      '/subscription/:code/manage/link',
+      {
+        params: { code },
+      },
+    );
+  }
+
+  async sendUpdateSubscriptionLink(code: string) {
+    return await this.http<Response | BadRequest>(
+      '/subscription/:code/manage/email',
+      {
+        method: 'POST',
+        params: { code },
+      },
+    );
   }
 }

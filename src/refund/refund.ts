@@ -1,4 +1,3 @@
-import { Axios } from 'axios';
 import {
   FetchRefundResponse,
   CreateRefund,
@@ -6,11 +5,11 @@ import {
   ListRefundsResponse,
   RefundCreatedResponse,
 } from './interface';
-import { BadRequest } from '../interface';
+import { TPaysackFetch } from '../fetch';
 
 export class Refund {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
@@ -18,21 +17,20 @@ export class Refund {
    * #### Create Refund
    * Initiate a refund on your integration
    */
-  async create(
-    data: CreateRefund,
-  ): Promise<RefundCreatedResponse | BadRequest> {
-    return await this.http.post('/refund', JSON.stringify(data));
+  async create(data: CreateRefund) {
+    return await this.http<RefundCreatedResponse>('/refund', {
+      method: 'POST',
+      body: data,
+    });
   }
 
   /**
    * #### List Refunds
    * List refunds available on your integration
    */
-  async list(
-    queryParams?: ListRefundQueryParams,
-  ): Promise<ListRefundsResponse | BadRequest> {
-    return await this.http.get('/refund', {
-      params: { ...queryParams },
+  async list(queryParams?: ListRefundQueryParams) {
+    return await this.http<ListRefundsResponse>('/refund', {
+      query: { ...queryParams },
     });
   }
 
@@ -40,7 +38,9 @@ export class Refund {
    * #### Fetch Refund
    * Get details of a refund on your integration
    */
-  async fetch(reference: string): Promise<FetchRefundResponse | BadRequest> {
-    return await this.http.get(`/refund/${reference}`);
+  async fetch(reference: string) {
+    return await this.http<FetchRefundResponse>('/refund/:reference', {
+      params: { reference },
+    });
   }
 }

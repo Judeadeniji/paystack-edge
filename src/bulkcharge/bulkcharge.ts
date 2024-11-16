@@ -1,5 +1,4 @@
-import { Axios } from 'axios';
-import { BadRequest, QueryParams, Response } from '../interface';
+import { QueryParams, Response } from '../interface';
 import {
   FetchBulkBatchChargeResponse,
   FetchChargesInBatchResponse,
@@ -8,45 +7,52 @@ import {
   ListBulkChargeBatchesResponse,
   QueryBatchChargesParams,
 } from './interface';
+import { TPaysackFetch } from '../fetch';
 
 export class BulkCharge {
-  http: Axios;
-  constructor(http: Axios) {
+  http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async initiate(
-    data: InitiateBulkCharge[],
-  ): Promise<InitiateBulkChargeResponse | BadRequest> {
-    return await this.http.post('/bulkcharge', JSON.stringify(data));
-  }
-
-  async list(
-    queryParams?: QueryParams,
-  ): Promise<ListBulkChargeBatchesResponse | BadRequest> {
-    return await this.http.get('/bulkcharge', { params: { ...queryParams } });
-  }
-
-  async fetchBulkCharge(
-    id: string,
-  ): Promise<FetchBulkBatchChargeResponse | BadRequest> {
-    return await this.http.get(`/bulkcharge/${id}`);
-  }
-
-  async fetchBatchChrges(
-    id: string,
-    queryParams?: QueryBatchChargesParams,
-  ): Promise<FetchChargesInBatchResponse | BadRequest> {
-    return await this.http.get(`/bulkcharge/${id}/charges`, {
-      params: { ...queryParams },
+  async initiate(data: InitiateBulkCharge[]) {
+    return await this.http<InitiateBulkChargeResponse>('/bulkcharge', {
+      method: 'POST',
+      body: data,
     });
   }
 
-  async pause(batchCode: string): Promise<Response | BadRequest> {
-    return await this.http.get(`/bulkcharge/pause/${batchCode}`);
+  async list(queryParams?: QueryParams) {
+    return await this.http<ListBulkChargeBatchesResponse>('/bulkcharge', {
+      query: { ...queryParams },
+    });
   }
 
-  async resume(batchCode: string): Promise<Response | BadRequest> {
-    return await this.http.get(`/bulkcharge/resume/${batchCode}`);
+  async fetchBulkCharge(id: string) {
+    return await this.http<FetchBulkBatchChargeResponse>('/bulkcharge/:id', {
+      params: { id },
+    });
+  }
+
+  async fetchBatchChrges(id: string, queryParams?: QueryBatchChargesParams) {
+    return await this.http<FetchChargesInBatchResponse>(
+      '/bulkcharge/:id/charges',
+      {
+        params: { id },
+        query: { ...queryParams },
+      },
+    );
+  }
+
+  async pause(batchCode: string) {
+    return await this.http<Response>('/bulkcharge/pause/:batchCode', {
+      params: { batchCode },
+    });
+  }
+
+  async resume(batchCode: string) {
+    return await this.http<Response>('/bulkcharge/resume/:batchCode', {
+      params: { batchCode },
+    });
   }
 }

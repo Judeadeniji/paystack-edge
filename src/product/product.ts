@@ -1,4 +1,3 @@
-import { Axios } from 'axios';
 import {
   CreateProduct,
   FetchProduct,
@@ -7,11 +6,7 @@ import {
   ProductCreated,
   UpdateProduct,
 } from './interface';
-
-interface BadRequest {
-  status: boolean;
-  message: string;
-}
+import { TPaysackFetch } from '../fetch';
 
 /**
  * @class Product
@@ -20,28 +15,35 @@ interface BadRequest {
  * on your integration
  */
 export class Product {
-  http: Axios;
-  constructor(http: Axios) {
+  http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async create(data: CreateProduct): Promise<ProductCreated | BadRequest> {
-    return await this.http.post('/product', JSON.stringify(data));
-  }
-  async list(
-    queryParams?: ListProductQueryParams,
-  ): Promise<ListProducts | BadRequest> {
-    return await this.http.get('/product', {
-      params: { ...queryParams },
+  async create(data: CreateProduct) {
+    return await this.http<ProductCreated>('/product', {
+      method: 'POST',
+      body: data,
     });
   }
-  async fetch(id: string): Promise<FetchProduct | BadRequest> {
-    return await this.http.get(`/product/${id}`);
+
+  async list(queryParams?: ListProductQueryParams) {
+    return await this.http<ListProducts>('/product', {
+      query: { ...queryParams },
+    });
   }
-  async update(
-    id: string,
-    data: CreateProduct,
-  ): Promise<UpdateProduct | BadRequest> {
-    return await this.http.put(`/product/${id}`, JSON.stringify(data));
+
+  async fetch(id: string) {
+    return await this.http<FetchProduct>('/product/:id', {
+      params: { id },
+    });
+  }
+
+  async update(id: string, data: CreateProduct) {
+    return await this.http<UpdateProduct>('/product/:id', {
+      method: 'PUT',
+      params: { id },
+      body: data,
+    });
   }
 }

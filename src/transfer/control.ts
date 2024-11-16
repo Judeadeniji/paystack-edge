@@ -1,5 +1,5 @@
-import { Axios } from 'axios';
-import { BadRequest, Response } from '../interface';
+import { TPaysackFetch } from '../fetch';
+import { Response } from '../interface';
 import {
   CheckBalanceResponse,
   LedgerBalanceResponse,
@@ -7,35 +7,38 @@ import {
 } from './interface';
 
 export class Control {
-  http: Axios;
-  constructor(http: Axios) {
+  http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async balance(): Promise<CheckBalanceResponse | BadRequest> {
-    return await this.http.get('/balance');
+  async balance() {
+    return await this.http<CheckBalanceResponse>('/balance');
   }
 
-  async ledgerBalance(): Promise<LedgerBalanceResponse | BadRequest> {
-    return await this.http.get('/balance/ledger');
+  async ledgerBalance() {
+    return await this.http<LedgerBalanceResponse>('/ledger_balance');
   }
 
-  async resendOTP(data: ResendTransferOTP): Promise<Response | BadRequest> {
-    return await this.http.post('/transfer/resend_otp', JSON.stringify(data));
+  async resendOTP(data: ResendTransferOTP) {
+    return await this.http<Response>('/transfer/resend_otp', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async disableOTP(): Promise<Response | BadRequest> {
-    return await this.http.post('/transfer/disable_otp');
+  async disableOTP() {
+    return await this.http<Response>('/transfer/disable_otp');
   }
 
-  async finalizeDisableOTP(otp: string): Promise<Response | BadRequest> {
-    return await this.http.post(
-      '/transfer/disable_otp_finalize',
-      JSON.stringify({ otp }),
-    );
+  async finalizeDisableOTP(otp: string) {
+    return await this.http<Response>('/transfer/disable_otp', {
+      method: 'POST',
+      body: { otp },
+    });
   }
 
-  async enableOTP(): Promise<Response | BadRequest> {
-    return await this.http.post('/transfer/enable_otp');
+  async enableOTP() {
+    return await this.http<Response>('/transfer/enable_otp');
   }
 }

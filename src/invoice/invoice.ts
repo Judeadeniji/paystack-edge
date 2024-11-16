@@ -1,5 +1,4 @@
-import { Axios } from 'axios';
-import { BadRequest, Response } from '../interface';
+import { TPaysackFetch } from '../fetch';
 import {
   CreateInvoice,
   InvoiceCreatedResponse,
@@ -9,55 +8,71 @@ import {
   UpdateInvoice,
   ViewInvoiceResponse,
 } from './interface';
+import { Response } from '../interface';
 
 export class Invoice {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async create(
-    data: CreateInvoice,
-  ): Promise<InvoiceCreatedResponse | BadRequest> {
-    return await this.http.post('/paymentrequest', JSON.stringify(data));
-  }
-
-  async list(
-    queryParams?: InvoiceQueryParams,
-  ): Promise<ListInvoicesResponse | BadRequest> {
-    return await this.http.get('/paymentrequest', {
-      params: { ...queryParams },
+  async create(data: CreateInvoice) {
+    return await this.http<InvoiceCreatedResponse>('/paymentrequest', {
+      method: 'POST',
+      body: data,
     });
   }
 
-  async view(id: string): Promise<ViewInvoiceResponse | BadRequest> {
-    return await this.http.get(`'/paymentrequest/${id}`);
+  async list(queryParams?: InvoiceQueryParams) {
+    return await this.http<ListInvoicesResponse>('/paymentrequest', {
+      query: { ...queryParams },
+    });
   }
 
-  async verify(code: string): Promise<ViewInvoiceResponse | BadRequest> {
-    return await this.http.get(`/paymentrequest/verify/${code}`);
+  async view(id: string) {
+    return await this.http<ViewInvoiceResponse>('/paymentrequest/:id', {
+      params: { id },
+    });
   }
 
-  async sendNotification(code: string): Promise<Response | BadRequest> {
-    return await this.http.post(`/paymentrequest/notify/${code}`);
+  async verify(code: string) {
+    return await this.http<ViewInvoiceResponse>(
+      '/paymentrequest/verify/:code',
+      {
+        params: { code },
+      },
+    );
   }
 
-  async total(): Promise<InvoiceTotalResponse | BadRequest> {
-    return await this.http.get('/paymentrequest/totals');
+  async sendNotification(code: string) {
+    return await this.http<Response>(
+      '/paymentrequest/send-notification/:code',
+      {
+        params: { code },
+      },
+    );
   }
 
-  async finalize(code: string): Promise<ViewInvoiceResponse | BadRequest> {
-    return await this.http.post(`/paymentrequest/finalize/${code}`);
+  async total() {
+    return await this.http<InvoiceTotalResponse>('/paymentrequest/total');
   }
 
-  async update(
-    id: string,
-    data: UpdateInvoice,
-  ): Promise<ViewInvoiceResponse | BadRequest> {
-    return await this.http.put(`/paymentrequest/${id}`, JSON.stringify(data));
+  async finalize(code: string) {
+    return await this.http<Response>('/paymentrequest/finalize/:code', {
+      params: { code },
+    });
+  }
+  async update(id: string, data: UpdateInvoice) {
+    return await this.http<Response>('/paymentrequest/:id', {
+      method: 'PUT',
+      params: { id },
+      body: data,
+    });
   }
 
-  async archive(code: string): Promise<Response | BadRequest> {
-    return await this.http.post(`/paymentrequest/archive/${code}`);
+  async archive(code: string) {
+    return await this.http<Response>('/paymentrequest/archive/:code', {
+      params: { code },
+    });
   }
 }

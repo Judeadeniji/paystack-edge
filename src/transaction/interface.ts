@@ -93,6 +93,7 @@ export interface Transaction {
   amount: number;
   currency: string;
   transaction_date: Date;
+  paid_at: Date;
   status: string;
   reference: string;
   domain: string;

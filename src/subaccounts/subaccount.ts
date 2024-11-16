@@ -1,5 +1,5 @@
-import { Axios } from 'axios';
-import { BadRequest, QueryParams } from '../interface';
+import { TPaysackFetch } from '../fetch';
+import { QueryParams } from '../interface';
 import {
   CreateUpdateSubAccount,
   FetchSubAccountResponse,
@@ -8,29 +8,35 @@ import {
 } from './interface';
 
 export class SubAccount {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async create(
-    data: CreateUpdateSubAccount,
-  ): Promise<SubAccountCreatedUpdateResponse | BadRequest> {
-    return await this.http.post('/subaccount', JSON.stringify(data));
+  async create(data: CreateUpdateSubAccount) {
+    return await this.http<SubAccountCreatedUpdateResponse>('/subaccount', {
+      method: 'POST',
+      body: data,
+    });
   }
 
-  async list(queryParams?: QueryParams): Promise<ListSubAccountsResponse> {
-    return await this.http.get('/subaccount', { params: { ...queryParams } });
+  async list(queryParams?: QueryParams) {
+    return await this.http<ListSubAccountsResponse>('/subaccount', {
+      query: { ...queryParams },
+    });
   }
 
-  async fetch(id: string): Promise<FetchSubAccountResponse | BadRequest> {
-    return await this.http.get(`/subaccount/${id}`);
+  async fetch(id: string) {
+    return await this.http<FetchSubAccountResponse>('/subaccount/:id', {
+      params: { id },
+    });
   }
 
-  async update(
-    id: string,
-    data: CreateUpdateSubAccount,
-  ): Promise<SubAccountCreatedUpdateResponse | BadRequest> {
-    return await this.http.put(`/subaccount/${id}`, JSON.stringify(data));
+  async update(id: string, data: CreateUpdateSubAccount) {
+    return await this.http<SubAccountCreatedUpdateResponse>('/subaccount/:id', {
+      method: 'PUT',
+      params: { id },
+      body: data,
+    });
   }
 }

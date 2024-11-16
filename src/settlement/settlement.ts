@@ -1,29 +1,30 @@
-import { Axios } from 'axios';
-import { BadRequest, QueryParams } from '../interface';
+import { QueryParams } from '../interface';
 import {
   ListSettlementsResponse,
   ListSettlementTransactionsResponse,
   SettlementQueryParams,
 } from './interface';
+import { TPaysackFetch } from '../fetch';
 
 export class Settlement {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
-  async list(
-    queryParams?: SettlementQueryParams,
-  ): Promise<ListSettlementsResponse | BadRequest> {
-    return await this.http.get('/settlement', { params: { ...queryParams } });
+  async list(queryParams?: SettlementQueryParams) {
+    return await this.http<ListSettlementsResponse>('/settlement', {
+      query: { ...queryParams },
+    });
   }
 
-  async transactions(
-    id: string,
-    queryParams: QueryParams,
-  ): Promise<ListSettlementTransactionsResponse | BadRequest> {
-    return await this.http.get(`/settlement/$[id]/transactions`, {
-      params: { ...queryParams },
-    });
+  async transactions(id: string, queryParams: QueryParams) {
+    return await this.http<ListSettlementTransactionsResponse>(
+      '/settlement/:id/transactions',
+      {
+        params: { id },
+        query: { ...queryParams },
+      },
+    );
   }
 }

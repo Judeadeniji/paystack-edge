@@ -1,16 +1,10 @@
-import { Axios } from 'axios';
 import {
   CreatePlan,
   ListPlanQueryParams,
   PlanResponse,
   UpdatePlan,
 } from './interface';
-
-interface BadRequest {
-  status: boolean;
-  message: string;
-  data: null;
-}
+import { TPaysackFetch } from '../fetch';
 
 /**
  * ## Plans
@@ -19,52 +13,52 @@ interface BadRequest {
  * @class Plan
  */
 export class Plan {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
   /**
    * ### Create Plan
    * Create a plan on your integration
-   * @param {CreatePlan} data Body Param
-   * @returns {Promise<PlanResponse | BadRequest>}
+   * @param {CreatePlan} data Body Parameters
    */
-  async create(data: CreatePlan): Promise<PlanResponse | BadRequest> {
-    return await this.http.post('/plan', JSON.stringify(data));
+  async create(data: CreatePlan) {
+    return await this.http<PlanResponse>('/plan', {
+      method: 'POST',
+      body: data,
+    });
   }
   /**
    * ### List Plans
    * List plans available on your integration
    * @param queryParams Query Parameters
-   * @returns {Promise<PlanResponse | BadRequest>}
    */
-  async list(
-    queryParams?: ListPlanQueryParams,
-  ): Promise<PlanResponse | BadRequest> {
-    return await this.http.get('/plan', {
-      params: { ...queryParams },
+  async list(queryParams?: ListPlanQueryParams) {
+    return await this.http<PlanResponse>('/plan', {
+      query: { ...queryParams },
     });
   }
   /**
    * ### Fetch Plan
    * Get details of a plan on your integration
    * @param id The plan `ID` or `code` you want to fetch
-   * @returns {Promise<PlanResponse | BadRequest>}
    */
-  async fetch(id: string): Promise<PlanResponse | BadRequest> {
-    return await this.http.get(`/plan/${id}`);
+  async fetch(id: string) {
+    return await this.http<PlanResponse>('/plan/:id', {
+      params: { id },
+    });
   }
   /**
    * ### Update Plan
    * Update a plan details on your integration
    * @param id Plans's `ID` or `code`
    * @param {UpdatePlan} data Update Plan Data
-   * @returns {Promise<PlanResponse | BadRequest>}
    */
-  async update(
-    id: string,
-    data: UpdatePlan,
-  ): Promise<PlanResponse | BadRequest> {
-    return await this.http.put(`/plan/${id}`, JSON.stringify(data));
+  async update(id: string, data: UpdatePlan) {
+    return await this.http<PlanResponse>('/plan/:id', {
+      method: 'PUT',
+      params: { id },
+      body: data,
+    });
   }
 }

@@ -1,5 +1,5 @@
-import { Axios } from 'axios';
-import { BadRequest, QueryParams, Response } from '../interface';
+import { TPaysackFetch } from '../fetch';
+import { QueryParams, Response } from '../interface';
 import {
   CreateRecipient,
   ListRecipientResponse,
@@ -9,8 +9,8 @@ import {
 } from './interface';
 
 export class Recipient {
-  private http: Axios;
-  constructor(http: Axios) {
+  private http: TPaysackFetch;
+  constructor(http: TPaysackFetch) {
     this.http = http;
   }
 
@@ -19,10 +19,7 @@ export class Recipient {
    *  A duplicate account number will lead to the retrieval of the existing record.
    * If you set `isBulk` to true, you must set the data as an array of recipients
    */
-  async create(
-    data: CreateRecipient | CreateRecipient[],
-    isBulk?: boolean,
-  ): Promise<RecipientCreatedResponse | BadRequest> {
+  async create(data: CreateRecipient | CreateRecipient[], isBulk?: boolean) {
     let body: unknown;
     let url = '/transferrecipient';
     body = data;
@@ -31,32 +28,36 @@ export class Recipient {
       body = { batch: data };
     }
 
-    return await this.http.post(url, JSON.stringify(body));
-  }
-
-  async list(
-    queryParams?: QueryParams,
-  ): Promise<ListRecipientResponse | BadRequest> {
-    return await this.http.get('/transferrecipient', {
-      params: { ...queryParams },
+    return await this.http<RecipientCreatedResponse>(url, {
+      method: 'POST',
+      body,
     });
   }
 
-  async fetch(id: string): Promise<ViewRecipientResponse | BadRequest> {
-    return await this.http.get(`/transferrecipient/${id}`);
+  async list(queryParams?: QueryParams) {
+    return await this.http<ListRecipientResponse>('/transferrecipient', {
+      query: { ...queryParams },
+    });
   }
 
-  async update(
-    id: string,
-    data: UpdateRecipient,
-  ): Promise<ViewRecipientResponse | BadRequest> {
-    return await this.http.put(
+  async fetch(id: string) {
+    return await this.http<ViewRecipientResponse>(`/transferrecipient/${id}`);
+  }
+
+  async update(id: string, data: UpdateRecipient) {
+    return await this.http<RecipientCreatedResponse>(
       `/transferrecipient/${id}`,
-      JSON.stringify(data),
+      {
+        method: 'PUT',
+        body: data,
+      },
     );
   }
 
-  async delete(id: string): Promise<Response | BadRequest> {
-    return await this.http.delete(`/transferrecipient/${id}`);
+  async delete(id: string) {
+    return await this.http<Response>('/transferrecipient/:id', {
+      method: 'DELETE',
+      params: { id },
+    });
   }
 }
