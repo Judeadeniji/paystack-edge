@@ -106,3 +106,5 @@ test.js
 
 yarn.lock
 .DS_Store
+package-lock.json
+bun.lockb

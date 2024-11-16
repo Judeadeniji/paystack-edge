@@ -1,3 +1,4 @@
+import { BadRequest } from './src/interface';
 import { Paystack } from './src/paystack';
 
 const paystack = new Paystack(
@@ -24,6 +25,12 @@ paystack.verification
     account_number: '8101424375',
     bank_code: '999992',
   })
-  .then((resolved) => {
-    console.log(resolved);
-  });
+  .then(({ error, data }) => {
+    if (error) {
+      throw error
+    }
+
+    console.log(data);
+  }).catch((error: BadRequest) => {
+    console.log(error);
+  })
