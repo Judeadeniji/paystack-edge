@@ -1,70 +1,93 @@
-# Paystack SDK
+# Paystack SDK (Edge)
 
-#### Why Another [Paystack](https://paystack.com) Package?
+## Why Another [Paystack](https://paystack.com) Package?
 
-Other packages are either outdated or don't support types.
+Other packages are either outdated or don't support TypeScript or only works with Node.js. This package is built with TypeScript and works with any JavaScript environment.
 
 ### Installation
 
-For Yarn
-`yarn add paystack-sdk`
+For Yarn:
 
-For NPM
-`npm install paystack-sdk`
+```sh
+yarn add paystack-edge-sdk
+```
+
+For NPM:
+
+```sh
+npm install paystack-edge-sdk
+```
 
 ### Usage
 
-For Typescript
+For TypeScript:
 
 ```typescript
-import {Paystack} from 'paystack-sdk';
+import { Paystack } from 'paystack-edge-sdk';
 
 const paystack = new Paystack("secret_key");
 ```
 
-For Javscript
+For JavaScript:
 
 ```javascript
-const Paystack = require('paystack-sdk').Paystack;
+const Paystack = require('paystack-edge-sdk').Paystack;
 const paystack = new Paystack('secret_key');
 ```
 
 OR
 
 ```javascript
-const { Paystack } = require('paystack-sdk');
+const { Paystack } = require('paystack-edge-sdk');
 const paystack = new Paystack('secret_key');
 ```
 
-All methods use promise meaning you can either use the `async...await` or `then...catch` or `try...catch`
+All methods use promises, meaning you can either use `async...await`, `then...catch`, or `try...catch`.
+
+### Example
+
+```typescript
+import { Paystack } from 'paystack-edge-sdk';
+
+const paystack = new Paystack("secret_key");
+
+const { data: transaction, error } = await paystack.transaction.initialize({
+  amount: 10000,
+  email: "email@example.com",
+});
+
+if (error) {
+  console.error(error);
+} else {
+  console.log(transaction);
+}
+```
 
 ### Modules
 
-- [x] Charge
-- [x] Customers
-- [x] Plans
-- [x] Products
-- [x] Subscriptions
-- [x] Transactions
-- [x] Transfers
-- [x] Dedicated Virtual Accounts
 - [x] Apple Pay
-- [x] Subaccounts
-- [x] Transaction Splits
-- [x] Settlements
-- [x] Invoices
-- [x] Transaction Recipients
-- [x] Transfers Control
 - [x] Bulk Charges
+- [x] Charge
+- [x] Customer
+- [x] Dedicated Virtual Accounts
+- [x] Invoice
+- [x] Payment Page
+- [x] Plan
+- [x] Product
+- [x] Recipient
+- [x] Refund
+- [x] Settlement
+- [x] SubAccount
+- [x] Subscription
+- [x] Transaction
+- [x] Transaction Split
+- [x] Transfer
+- [x] Verification
 - [ ] Control Panel
 - [ ] Disputes
-- [x] Refunds
-- [x] Verification
 - [ ] Miscellaneous
 
-## CONTRIBUTING
+### Contributing
 
-If you notice a missing function, or maybe a bug. Please feel free to submit
-a PR. I will take a look at it.
-You will need to fork the repo and create a PR against it with your changes.  
-Thank you :smile:
+If you notice a missing function or a bug, please feel free to submit a PR. You will need to fork the repo and create a PR against it with your changes.  
+Thank you! :smile:
