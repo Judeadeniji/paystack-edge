@@ -21,6 +21,7 @@ import { PaystackFetch, TPaysackFetch } from './fetch';
 /**
  * Paystack SDK
  * @author Asaju Enitan <@tPriest>
+ * @author Adeniji Oluwaferanmi <@FeranmiWebDev>
  */
 
 export class Paystack {
