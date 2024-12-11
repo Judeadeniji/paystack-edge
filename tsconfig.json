@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES2015",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "declaration": true,
     "outDir": "./dist",
@@ -11,7 +11,7 @@
     "checkJs": true,
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": false,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "**/__tests__/*"]

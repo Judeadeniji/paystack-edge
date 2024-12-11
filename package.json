@@ -1,6 +1,6 @@
 {
   "name": "paystack-edge-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Paystack SDK written in Typescript for development on edge and serverless servers",
   "main": "dist/index.js",
   "author": "Adeniji Oluwaferanmi",
